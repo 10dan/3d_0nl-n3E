@@ -6,14 +6,22 @@ from auto_subtitle.cli import process_videos
 
 client = OpenAI()
 today = datetime.today().strftime("%Y%m%d")
-
+# Todo: add ambient sounds e.g. fireplace
+image_path = "imgs/4.png" 
+# message = """
+#     The sooner we stop listening to their messages, 
+#     the sooner we will be liberated...
+#     Like, Comment and subscribe to manipulate the algorithm.
+#     Share this message.
+#     """
 message = """
-    The sooner we stop listening to their messages, 
-    the sooner we will be liberated...
-    Like, Comment and subscribe to manipulate the algorithm.
-    Share this message.
+    If you are seeing this, it is not an accident.
+    As you know, the youtube algorithm is advanced beyond
+    human comprehension. It takes a person like
+    you to understand. This channel is for you.
+    Pause the video now, close your eyes, enter your mind.
+    Stay there until YOU know what to do next.
     """
-
 speech_file_path = Path(__file__).parent / f"sound/speech_{today}.mp3"
 response = client.audio.speech.create(model="tts-1", voice="onyx", input=message)
 
@@ -27,7 +35,6 @@ audio_duration = audio_clip.duration
 width, height = 1080, 1920
 
 # Load image and get its size
-image_path = "imgs/1.png"  # Replace with your image path
 image_clip = ImageClip(image_path)
 image_width, image_height = image_clip.size
 
@@ -62,7 +69,7 @@ video_clip.write_videofile(str(video_file_path), codec="libx264", fps=24)
 process_videos([str(video_file_path)], model="base", output_dir="subtitled", output_srt=True)
 
 # Add the audio back to the video
-subtitled_video_path = Path(__file__).parent / f"subtitled/video_{today}.mp4"  # Adjust the path according to your output structure
+subtitled_video_path = Path(__file__).parent / f"subtitled/video_{today}.mp4" 
 
 # Load the subtitled video (without audio)
 subtitled_video_clip = VideoFileClip(str(subtitled_video_path))
@@ -73,4 +80,7 @@ final_video_clip = subtitled_video_clip.set_audio(audio_clip)
 # Output the final video file
 final_video_file_path = Path(__file__).parent / f"out/final_video_{today}.mp4"
 final_video_clip.write_videofile(str(final_video_file_path), codec="libx264", fps=24)
+
+subtitled_video_path.unlink()
+video_file_path.unlink()
 
