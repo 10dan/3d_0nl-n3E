@@ -1,7 +1,8 @@
 from pathlib import Path
 from openai import OpenAI
-from moviepy.editor import AudioFileClip, ImageClip
+from moviepy.editor import AudioFileClip, ImageClip, VideoFileClip
 from datetime import datetime
+from auto_subtitle.cli import process_videos
 
 client = OpenAI()
 today = datetime.today().strftime("%Y%m%d")
@@ -56,4 +57,20 @@ cropped_image_clip = cropped_image_clip.set_duration(audio_duration)
 video_clip = cropped_image_clip.set_audio(audio_clip)
 
 # Output video file
-video_clip.write_videofile("out/output_video.mp4", codec="libx264", fps=24)
+video_file_path = Path(__file__).parent / f"out/video_{today}.mp4"
+video_clip.write_videofile(str(video_file_path), codec="libx264", fps=24)
+process_videos([str(video_file_path)], model="base", output_dir="subtitled", output_srt=True)
+
+# Add the audio back to the video
+subtitled_video_path = Path(__file__).parent / f"subtitled/video_{today}.mp4"  # Adjust the path according to your output structure
+
+# Load the subtitled video (without audio)
+subtitled_video_clip = VideoFileClip(str(subtitled_video_path))
+
+# Combine the subtitled video with the original audio
+final_video_clip = subtitled_video_clip.set_audio(audio_clip)
+
+# Output the final video file
+final_video_file_path = Path(__file__).parent / f"out/final_video_{today}.mp4"
+final_video_clip.write_videofile(str(final_video_file_path), codec="libx264", fps=24)
+
