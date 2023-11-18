@@ -8,7 +8,7 @@ speech_file_path = Path(__file__).parent / "speech_onyx.mp3"
 response = client.audio.speech.create(
   model="tts-1",
   voice="onyx",
-  input="The sooner we stop listening to their messages, the sooner we will be liberated"
+  input="The sooner we stop listening to their messages, the sooner we will be liberated. i will speak for a long time, but. not. forever."
 )
 
 response.stream_to_file(speech_file_path)
